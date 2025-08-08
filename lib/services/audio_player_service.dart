@@ -11,6 +11,10 @@ class AudioPlayerService {
     await _audioPlayer.setUrl(url);
   }
 
+  Future<void> setSpeed(double speed) async {
+    await _audioPlayer.setSpeed(speed);
+  }
+
   Future<void> play() => _audioPlayer.play();
 
   Future<void> pause() => _audioPlayer.pause();
