@@ -1,3 +1,5 @@
+import 'package:audio_player_app/screens/auth/login_screen.dart';
+import 'package:audio_player_app/screens/auth/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -15,6 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        // '/': (context) =>  HomeScreen(),
+        '/login': (context) => LoginScreen(),
+        '/signup': (context) => SignupScreen(),
+      },
       home: Scaffold(body: Center(child: Text('Audio Player App'))),
     );
   }
