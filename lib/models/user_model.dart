@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AppUser {
   final String uid;
   final String displayName;
@@ -19,7 +21,9 @@ class AppUser {
       displayName: map['displayName'] ?? '',
       email: map['email'] ?? '',
       profileImageUrl: map['profileImageUrl'],
-      createdAt: (map['createdAt'] as DateTime?) ?? DateTime.now(),
+      createdAt: map['createdAt'] is DateTime
+          ? map['createdAt']
+          : (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
