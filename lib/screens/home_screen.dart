@@ -11,7 +11,18 @@ class HomeScreen extends ConsumerWidget {
     final userAsyncValue = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Audio Player')),
+      appBar: AppBar(
+        actions: [
+          ElevatedButton.icon(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await ref.read(authRepositoryProvider).signOut();
+            },
+            label: const Text('Logout'),
+          ),
+        ],
+        title: const Text('Audio Player'),
+      ),
       body: Center(
         child: ElevatedButton.icon(
           icon: const Icon(Icons.cloud_upload),
