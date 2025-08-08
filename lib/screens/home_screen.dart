@@ -1,20 +1,44 @@
-import 'package:audio_player_app/widgets/audio_player_controls.dart';
+import 'package:audio_player_app/providers/auth_provider.dart';
+import 'package:audio_player_app/widgets/auth_required_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const exampleAudioUrl =
-        'https://res.cloudinary.com/demo/video/upload/sample.mp3';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsyncValue = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Audio Player')),
       body: Center(
-        child: AudioPlayerControls(
-          audioUrl: exampleAudioUrl,
-          title: 'Sample Track',
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.cloud_upload),
+          label: const Text('Upload Audio'),
+          onPressed: () {
+            userAsyncValue.when(
+              data: (user) {
+                if (user == null) {
+                  // Show login prompt dialog
+                  showDialog(
+                    context: context,
+                    builder: (context) => AuthRequiredDialog(
+                      onLoginTap: () {
+                        Navigator.of(context).pop(); // close dialog
+                        Navigator.of(context).pushNamed('/login');
+                      },
+                    ),
+                  );
+                } else {
+                  // User logged in, go to upload screen
+                  Navigator.of(context).pushNamed('/upload');
+                }
+              },
+              loading: () => null, // or show loading indicator
+              error: (err, stack) => null,
+            );
+          },
         ),
       ),
     );
