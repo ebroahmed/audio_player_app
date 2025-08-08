@@ -33,7 +33,7 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
   Future<void> _init() async {
     try {
       await player.setUrl(widget.audioUrl);
-      await player._audioPlayer.setSpeed(playbackSpeed); // start at 1x speed
+      await player.setSpeed(playbackSpeed); // start at 1x speed
     } catch (e) {
       // handle error loading audio URL
     }
@@ -160,7 +160,7 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                           setState(() {
                             playbackSpeed = speed;
                           });
-                          player._audioPlayer.setSpeed(speed);
+                          player.setSpeed(speed);
                         },
                       ),
                     ),
