@@ -1,3 +1,4 @@
+import 'package:audio_player_app/screens/audio_player_screen.dart';
 import 'package:audio_player_app/services/audio_service.dart';
 import 'package:flutter/material.dart';
 
@@ -30,8 +31,17 @@ class AudioListScreen extends StatelessWidget {
                 title: Text(audio['title'] ?? 'No Title'),
                 subtitle: Text(audio['artist'] ?? 'Unknown Artist'),
                 onTap: () {
-                  // Later: navigate to audio player page
-                  print("Play: ${audio['audioUrl']}");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AudioPlayerScreen(
+                        title: audio['title'],
+                        artist: audio['artist'],
+                        description: audio['description'],
+                        audioUrl: audio['audioUrl'],
+                      ),
+                    ),
+                  );
                 },
               );
             },
