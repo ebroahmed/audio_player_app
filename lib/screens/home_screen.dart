@@ -1,4 +1,5 @@
 import 'package:audio_player_app/providers/auth_provider.dart';
+import 'package:audio_player_app/screens/audio_list_screen.dart';
 import 'package:audio_player_app/widgets/auth_required_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,15 @@ class HomeScreen extends ConsumerWidget {
               await ref.read(authRepositoryProvider).signOut();
             },
             label: const Text('Logout'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AudioListScreen()),
+              );
+            },
+            child: const Text("View Uploaded Audios"),
           ),
         ],
         title: const Text('Audio Player'),
