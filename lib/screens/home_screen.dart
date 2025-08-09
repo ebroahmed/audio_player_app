@@ -1,7 +1,13 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:on_audio_query/on_audio_query.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'audio_player_screen.dart'; // Your modern audio player screen
+import 'audio_player_screen.dart'; // Your existing modern audio player screen
+
+class LocalAudioFile {
+  final String path;
+  final String name;
+
+  LocalAudioFile({required this.path, required this.name});
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,77 +17,87 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final OnAudioQuery _audioQuery = OnAudioQuery();
-  List<SongModel> _songs = [];
-  bool _loading = true;
+  List<LocalAudioFile> _audioFiles = [];
+  bool _loading = false;
+
+  Future<void> _pickAudioFiles() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: true,
+      );
+
+      if (result != null) {
+        List<LocalAudioFile> files = result.files
+            .map((file) => LocalAudioFile(path: file.path!, name: file.name))
+            .toList();
+
+        setState(() {
+          _audioFiles = files;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking files: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to pick audio files: $e')));
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _requestPermissionAndLoadSongs();
-  }
-
-  Future<void> _requestPermissionAndLoadSongs() async {
-    final status = await Permission.storage.status;
-    if (!status.isGranted) {
-      final result = await Permission.storage.request();
-      if (!result.isGranted) {
-        // Permission denied, show a message and return
-        setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Storage permission is required to load local audios.",
-            ),
-          ),
-        );
-        return;
-      }
-    }
-
-    List<SongModel> songs = await _audioQuery.querySongs(
-      sortType: SongSortType.DISPLAY_NAME,
-      orderType: OrderType.ASC_OR_SMALLER,
-      uriType: UriType.EXTERNAL,
-      ignoreCase: true,
-    );
-
-    setState(() {
-      _songs = songs;
-      _loading = false;
-    });
+    // Optionally, you can call _pickAudioFiles() here to prompt immediately
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Local Audio List')),
+      appBar: AppBar(
+        title: const Text('Local Audio List'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.library_music),
+            tooltip: 'Pick audio files',
+            onPressed: _pickAudioFiles,
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : _songs.isEmpty
-          ? const Center(child: Text('No audio files found on this device.'))
+          : _audioFiles.isEmpty
+          ? Center(
+              child: Text(
+                'No audio files loaded.\nTap the music icon to pick files.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
+            )
           : ListView.builder(
-              itemCount: _songs.length,
+              itemCount: _audioFiles.length,
               itemBuilder: (context, index) {
-                final localSong = _songs[index];
+                final file = _audioFiles[index];
                 return ListTile(
-                  leading: QueryArtworkWidget(
-                    id: localSong.id,
-                    type: ArtworkType.AUDIO,
-                    nullArtworkWidget: const Icon(Icons.music_note, size: 40),
-                  ),
-                  title: Text(localSong.title),
-                  subtitle: Text(localSong.artist ?? 'Unknown Artist'),
+                  leading: const Icon(Icons.audiotrack, size: 40),
+                  title: Text(file.name),
+                  subtitle: Text(file.path),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => AudioPlayerScreen(
-                          title: localSong.title,
-                          artist: localSong.artist ?? 'Unknown Artist',
-                          description:
-                              '', // no description for local files, you can customize
-                          audioPath: '',
+                          title: file.name,
+                          artist: 'Local File',
+                          description: '',
+                          audioPath: file.path,
                         ),
                       ),
                     );
