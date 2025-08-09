@@ -6,14 +6,14 @@ class AudioPlayerScreen extends ConsumerWidget {
   final String title;
   final String artist;
   final String description;
-  final String audioUrl;
+  final String audioPath;
 
   const AudioPlayerScreen({
     super.key,
     required this.title,
     required this.artist,
     required this.description,
-    required this.audioUrl,
+    required this.audioPath,
   });
 
   @override
@@ -132,7 +132,7 @@ class AudioPlayerScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // Audio Controls
-                AudioPlayerControls(audioUrl: audioUrl, title: title),
+                AudioPlayerControls(audioPath: audioPath, title: title),
 
                 const SizedBox(height: 30),
               ],

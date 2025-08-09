@@ -11,6 +11,10 @@ class AudioPlayerService {
     await _audioPlayer.setUrl(url);
   }
 
+  Future<void> setFilePath(String url) async {
+    await _audioPlayer.setFilePath(url);
+  }
+
   Future<void> setSpeed(double speed) async {
     await _audioPlayer.setSpeed(speed);
   }

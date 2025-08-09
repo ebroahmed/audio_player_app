@@ -1,67 +1,94 @@
-import 'package:audio_player_app/providers/auth_provider.dart';
-import 'package:audio_player_app/screens/audio_list_screen.dart';
-import 'package:audio_player_app/widgets/auth_required_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'audio_player_screen.dart'; // Your modern audio player screen
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userAsyncValue = ref.watch(currentUserProvider);
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final OnAudioQuery _audioQuery = OnAudioQuery();
+  List<SongModel> _songs = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissionAndLoadSongs();
+  }
+
+  Future<void> _requestPermissionAndLoadSongs() async {
+    final status = await Permission.storage.status;
+    if (!status.isGranted) {
+      final result = await Permission.storage.request();
+      if (!result.isGranted) {
+        // Permission denied, show a message and return
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Storage permission is required to load local audios.",
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    List<SongModel> songs = await _audioQuery.querySongs(
+      sortType: SongSortType.DISPLAY_NAME,
+      orderType: OrderType.ASC_OR_SMALLER,
+      uriType: UriType.EXTERNAL,
+      ignoreCase: true,
+    );
+
+    setState(() {
+      _songs = songs;
+      _loading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          ElevatedButton.icon(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authRepositoryProvider).signOut();
-            },
-            label: const Text('Logout'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => AudioListScreen()),
-              );
-            },
-            child: const Text("View Uploaded Audios"),
-          ),
-        ],
-        title: const Text('Audio Player'),
-      ),
-      body: Center(
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.cloud_upload),
-          label: const Text('Upload Audio'),
-          onPressed: () {
-            userAsyncValue.when(
-              data: (user) {
-                if (user == null) {
-                  // Show login prompt dialog
-                  showDialog(
-                    context: context,
-                    builder: (context) => AuthRequiredDialog(
-                      onLoginTap: () {
-                        Navigator.of(context).pop(); // close dialog
-                        Navigator.of(context).pushNamed('/login');
-                      },
-                    ),
-                  );
-                } else {
-                  // User logged in, go to upload screen
-                  Navigator.of(context).pushNamed('/upload');
-                }
+      appBar: AppBar(title: const Text('Local Audio List')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _songs.isEmpty
+          ? const Center(child: Text('No audio files found on this device.'))
+          : ListView.builder(
+              itemCount: _songs.length,
+              itemBuilder: (context, index) {
+                final localSong = _songs[index];
+                return ListTile(
+                  leading: QueryArtworkWidget(
+                    id: localSong.id,
+                    type: ArtworkType.AUDIO,
+                    nullArtworkWidget: const Icon(Icons.music_note, size: 40),
+                  ),
+                  title: Text(localSong.title),
+                  subtitle: Text(localSong.artist ?? 'Unknown Artist'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AudioPlayerScreen(
+                          title: localSong.title,
+                          artist: localSong.artist ?? 'Unknown Artist',
+                          description:
+                              '', // no description for local files, you can customize
+                          audioPath: '',
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
-              loading: () => null, // or show loading indicator
-              error: (err, stack) => null,
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }

@@ -1,52 +1,118 @@
-import 'package:audio_player_app/screens/audio_player_screen.dart';
-import 'package:audio_player_app/services/audio_service.dart';
+import 'package:audio_player_app/widgets/audio_player_controls.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AudioListScreen extends StatelessWidget {
-  final AudioService _audioService = AudioService();
+class AudioPlayerScreen extends ConsumerWidget {
+  final String title;
+  final String artist;
+  final String description;
+  final String audioPath; // renamed from audioUrl
 
-  AudioListScreen({super.key});
+  const AudioPlayerScreen({
+    super.key,
+    required this.title,
+    required this.artist,
+    required this.description,
+    required this.audioPath,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text("All Audios")),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _audioService.getAllAudios(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No audios found"));
-          }
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E1E2C), Color(0xFF2A2A40)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(height: 30),
 
-          final audios = snapshot.data!;
-          return ListView.builder(
-            itemCount: audios.length,
-            itemBuilder: (context, index) {
-              final audio = audios[index];
-              return ListTile(
-                leading: const Icon(Icons.music_note),
-                title: Text(audio['title'] ?? 'No Title'),
-                subtitle: Text(audio['artist'] ?? 'Unknown Artist'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AudioPlayerScreen(
-                        title: audio['title'],
-                        artist: audio['artist'],
-                        description: audio['description'],
-                        audioUrl: audio['audioUrl'],
+                // Artwork / Placeholder
+                Hero(
+                  tag: title, // match from list page
+                  child: Container(
+                    height: 280,
+                    width: 280,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: const DecorationImage(
+                        image: AssetImage(
+                          "assets/images/placeholder_music.jpg",
+                        ), // or dynamic
+                        fit: BoxFit.cover,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 25,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // Track Info
+                Column(
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      artist,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                },
-              );
-            },
-          );
-        },
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+
+                // Audio Controls (with local or network support)
+                AudioPlayerControls(audioPath: audioPath, title: title),
+
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

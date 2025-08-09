@@ -5,12 +5,12 @@ import 'package:just_audio/just_audio.dart';
 import '../providers/audio_player_provider.dart';
 
 class AudioPlayerControls extends ConsumerStatefulWidget {
-  final String audioUrl;
+  final String audioPath; // renamed from audioUrl
   final String title;
 
   const AudioPlayerControls({
     super.key,
-    required this.audioUrl,
+    required this.audioPath,
     required this.title,
   });
 
@@ -32,10 +32,15 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
 
   Future<void> _init() async {
     try {
-      await player.setUrl(widget.audioUrl);
+      if (widget.audioPath.startsWith('http')) {
+        await player.setUrl(widget.audioPath);
+      } else {
+        await player.setFilePath(widget.audioPath);
+      }
       await player.setSpeed(playbackSpeed); // start at 1x speed
     } catch (e) {
-      // handle error loading audio URL
+      // handle error loading audio URL or local file
+      debugPrint('Error loading audio: $e');
     }
   }
 
