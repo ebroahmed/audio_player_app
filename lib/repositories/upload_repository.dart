@@ -19,8 +19,17 @@ class UploadRepository {
       allowMultiple: false,
     );
 
-    if (result != null && result.files.single.path != null) {
-      return File(result.files.single.path!);
+    if (result != null) {
+      if (result.files.single.path != null) {
+        return File(result.files.single.path!);
+      } else if (result.files.single.bytes != null) {
+        // Save bytes to a temp file and return it
+        final tempDir = Directory.systemTemp;
+        final tempFile = await File(
+          '${tempDir.path}/${result.files.single.name}',
+        ).writeAsBytes(result.files.single.bytes!);
+        return tempFile;
+      }
     }
 
     return null;
