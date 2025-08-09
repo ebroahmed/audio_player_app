@@ -19,17 +19,8 @@ class UploadRepository {
       allowMultiple: false,
     );
 
-    if (result != null) {
-      if (result.files.single.path != null) {
-        return File(result.files.single.path!);
-      } else if (result.files.single.bytes != null) {
-        // Save bytes to a temp file and return it
-        final tempDir = Directory.systemTemp;
-        final tempFile = await File(
-          '${tempDir.path}/${result.files.single.name}',
-        ).writeAsBytes(result.files.single.bytes!);
-        return tempFile;
-      }
+    if (result != null && result.files.single.path != null) {
+      return File(result.files.single.path!);
     }
 
     return null;
@@ -37,7 +28,7 @@ class UploadRepository {
 
   // Upload file to Cloudinary and return URL
   Future<String> uploadToCloudinary(File file) async {
-    final url = 'https://api.cloudinary.com/v1_1/$cloudName/audio/upload';
+    final url = 'https://api.cloudinary.com/v1_1/$cloudName/auto/upload';
 
     final formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(file.path),

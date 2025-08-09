@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ebrahim.audio_player_app"
+    namespace = "com.example.audio_player_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 

@@ -17,19 +17,9 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
   String? errorMessage;
 
   Future<void> _pickFile() async {
-    try {
-      final file = await ref.read(uploadRepositoryProvider).pickAudioFile();
-      if (file != null) {
-        ref.read(selectedFileProvider.notifier).state = file;
-      } else {
-        setState(() {
-          errorMessage = 'No file selected or file access error.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error picking file: $e';
-      });
+    final file = await ref.read(uploadRepositoryProvider).pickAudioFile();
+    if (file != null) {
+      ref.read(selectedFileProvider.notifier).state = file;
     }
   }
 
