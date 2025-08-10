@@ -1,7 +1,8 @@
 import 'package:audio_player_app/screens/upload_screen.dart';
+import 'package:audio_player_app/widgets/free_audios_list_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'audio_player_screen.dart'; // Your existing modern audio player screen
+import 'audio_player_screen.dart';
 
 class LocalAudioFile {
   final String path;
@@ -19,85 +20,67 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<LocalAudioFile> _audioFiles = [];
-  bool _loading = false;
 
   Future<void> _pickAudioFiles() async {
-    setState(() {
-      _loading = true;
-    });
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+      allowMultiple: true,
+    );
 
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.audio,
-        allowMultiple: true,
-      );
+    if (result != null) {
+      List<LocalAudioFile> files = result.files
+          .map((file) => LocalAudioFile(path: file.path!, name: file.name))
+          .toList();
 
-      if (result != null) {
-        List<LocalAudioFile> files = result.files
-            .map((file) => LocalAudioFile(path: file.path!, name: file.name))
-            .toList();
-
-        setState(() {
-          _audioFiles = files;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking files: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to pick audio files: $e')));
-    } finally {
       setState(() {
-        _loading = false;
+        _audioFiles = files;
       });
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Optionally, you can call _pickAudioFiles() here to prompt immediately
+  String _shortPath(String fullPath) {
+    if (fullPath.length <= 25) return fullPath;
+    return '...${fullPath.substring(fullPath.length - 25)}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Local Audio List'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.library_music),
-            tooltip: 'Pick audio files',
+      appBar: AppBar(title: const Text('Local Audio List')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          ElevatedButton.icon(
             onPressed: _pickAudioFiles,
+            icon: const Icon(Icons.library_music),
+            label: const Text('Add audios from local storage.'),
           ),
-          ElevatedButton(
+          const SizedBox(height: 8),
+          ElevatedButton.icon(
             onPressed: () {
               Navigator.of(
                 context,
               ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
             },
-            child: Text('Upload'),
+            icon: const Icon(Icons.upload_file),
+            label: const Text('Upload your audios.'),
           ),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _audioFiles.isEmpty
-          ? Center(
-              child: Text(
-                'No audio files loaded.\nTap the music icon to pick files.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-              ),
-            )
-          : ListView.builder(
+          const SizedBox(height: 16),
+          if (_audioFiles.isNotEmpty) ...[
+            const Text(
+              'Local Audios:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: _audioFiles.length,
               itemBuilder: (context, index) {
                 final file = _audioFiles[index];
                 return ListTile(
                   leading: const Icon(Icons.audiotrack, size: 40),
                   title: Text(file.name),
-                  subtitle: Text(file.path),
+                  subtitle: Text(_shortPath(file.path)),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -114,6 +97,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+            const Divider(),
+          ],
+          const Text(
+            'Free Audios:',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SingleChildScrollView(
+            child: SizedBox(
+              height: 400, // Adjust as needed
+              child: FreeAudiosListWidget(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
