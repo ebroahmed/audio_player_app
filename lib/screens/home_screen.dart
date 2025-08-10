@@ -1,3 +1,4 @@
+import 'package:audio_player_app/screens/upload_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'audio_player_screen.dart'; // Your existing modern audio player screen
@@ -68,6 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.library_music),
             tooltip: 'Pick audio files',
             onPressed: _pickAudioFiles,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
+            },
+            child: Text('Upload'),
           ),
         ],
       ),
