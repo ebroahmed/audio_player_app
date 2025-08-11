@@ -45,47 +45,99 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              if (errorMessage != null)
-                Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (val) => email = val.trim(),
-                validator: (val) => val == null || !val.contains('@')
-                    ? 'Enter a valid email'
-                    : null,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (val) => password = val.trim(),
-                validator: (val) =>
-                    val == null || val.length < 6 ? 'Password too short' : null,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: isLoading ? null : _login,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Login'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/signup');
-                },
-                child: const Text('Don\'t have an account? Sign Up'),
-              ),
-            ],
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text('Login'),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          Center(
+            child: Image(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
+              image: AssetImage('assets/images/track.png'),
+            ),
           ),
-        ),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  if (errorMessage != null)
+                    Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (val) => email = val.trim(),
+                    validator: (val) => val == null || !val.contains('@')
+                        ? 'Enter a valid email'
+                        : null,
+                  ),
+                  TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      labelStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                      ),
+                    ),
+                    obscureText: true,
+                    onChanged: (val) => password = val.trim(),
+                    validator: (val) => val == null || val.length < 6
+                        ? 'Password too short'
+                        : null,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: isLoading ? null : _login,
+                    child: isLoading
+                        ? CircularProgressIndicator()
+                        : Text('Login'),
+                  ),
+                  SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/signup');
+                    },
+                    child: Text(
+                      'Don\'t have an account? Sign Up',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
