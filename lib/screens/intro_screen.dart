@@ -26,43 +26,36 @@ class _IntroScreenState extends State<IntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: 20),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 80),
-              child: SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.brown),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 100),
+          child: Column(
+            children: [
+              SizedBox(
+                width: 200,
+                height: 200,
+                child: Image.asset('assets/images/track.png'),
+              ),
+
+              SizedBox(height: 20),
+              Text(
+                "Enjoy Your Moment!",
+                style: GoogleFonts.poppins(color: Colors.grey),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 80),
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.brown),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.only(left: 80, right: 80, bottom: 40, top: 40),
-            child: Image.asset('assets/images/track.png'),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "You can get fresh fruits from our corner store",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 35,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Fresh item everyday",
-            style: GoogleFonts.poppins(color: Colors.grey),
-          ),
-        ],
+        ),
       ),
     );
   }
