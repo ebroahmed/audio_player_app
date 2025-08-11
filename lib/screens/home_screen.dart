@@ -103,11 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
             'Free Audios:',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          SingleChildScrollView(
-            child: SizedBox(
-              height: 400, // Adjust as needed
-              child: FreeAudiosListWidget(),
-            ),
+          SizedBox(
+            height: 400, // Adjust as needed
+            child: FreeAudiosListWidget(),
           ),
         ],
       ),
