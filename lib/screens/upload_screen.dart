@@ -1,3 +1,4 @@
+import 'package:audio_player_app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,6 +81,15 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text('Upload Audio', style: GoogleFonts.quicksand(fontSize: 20)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              final auth = ref.read(authRepositoryProvider);
+              auth.signOut();
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(

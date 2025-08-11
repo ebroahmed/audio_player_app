@@ -1,7 +1,10 @@
+import 'package:audio_player_app/providers/auth_provider.dart';
 import 'package:audio_player_app/screens/upload_screen.dart';
+
 import 'package:audio_player_app/widgets/free_audios_list_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'audio_player_screen.dart';
@@ -13,14 +16,14 @@ class LocalAudioFile {
   LocalAudioFile({required this.path, required this.name});
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<LocalAudioFile> _audioFiles = [];
   bool _isLocalFilesLoading = false;
   int _currentIndex = 0;
@@ -57,6 +60,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return '...${fullPath.substring(fullPath.length - 25)}';
   }
 
+  void _authToUpload() {
+    final userAsync = ref.read(currentUserProvider);
+    userAsync.when(
+      data: (user) {
+        if (user == null) {
+          // Not logged in, show login screen
+          Navigator.of(context).pushNamed('/login');
+        } else {
+          // Logged in, go to upload screen
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
+        }
+      },
+      loading: () {},
+      error: (err, stack) {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,11 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const UploadScreen()),
-                  );
-                },
+                onPressed: _authToUpload,
                 icon: const Icon(Icons.upload_file),
                 label: const Text('Upload your audios.'),
               ),
