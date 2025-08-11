@@ -28,7 +28,7 @@ class _IntroScreenState extends State<IntroScreen> {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 100),
+          padding: const EdgeInsets.symmetric(vertical: 200),
           child: Column(
             children: [
               SizedBox(
@@ -40,7 +40,10 @@ class _IntroScreenState extends State<IntroScreen> {
               SizedBox(height: 20),
               Text(
                 "Enjoy Your Moment!",
-                style: GoogleFonts.poppins(color: Colors.grey),
+                style: GoogleFonts.solway(
+                  fontSize: 20,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 80),

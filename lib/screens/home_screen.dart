@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Local Audio List')),
+      appBar: AppBar(title: const Text('Audio Player')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
