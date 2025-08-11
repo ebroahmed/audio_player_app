@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/upload_provider.dart';
 
 class UploadScreen extends ConsumerStatefulWidget {
@@ -53,9 +54,12 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
 
       ref.read(selectedFileProvider.notifier).state = null;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Upload successful!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          content: Text('Upload successful!'),
+        ),
+      );
 
       Navigator.of(context).pop();
     } catch (e) {
@@ -73,62 +77,138 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     final isUploading = ref.watch(uploadStateProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Audio')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            ElevatedButton.icon(
-              onPressed: _pickFile,
-              icon: const Icon(Icons.audiotrack),
-              label: Text(
-                selectedFile == null ? 'Pick Audio File' : 'Change Audio File',
-              ),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text('Upload Audio', style: GoogleFonts.quicksand(fontSize: 20)),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          Center(
+            child: Image(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
+              image: const AssetImage('assets/images/track.png'),
             ),
-            if (selectedFile != null)
-              Text('Selected: ${selectedFile.path.split('/').last}'),
+          ),
 
-            const SizedBox(height: 16),
-
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Title'),
-                    validator: (val) =>
-                        val == null || val.isEmpty ? 'Enter title' : null,
-                    onChanged: (val) => title = val.trim(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+            child: ListView(
+              children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Artist'),
-                    validator: (val) =>
-                        val == null || val.isEmpty ? 'Enter artist' : null,
-                    onChanged: (val) => artist = val.trim(),
+                  onPressed: _pickFile,
+                  icon: const Icon(Icons.audiotrack),
+                  label: Text(
+                    selectedFile == null
+                        ? 'Pick Audio File'
+                        : 'Change Audio File',
                   ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Description (optional)',
+                ),
+                if (selectedFile != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      'Selected: ${selectedFile.path.split('/').last}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                     ),
-                    onChanged: (val) => description = val.trim(),
                   ),
-                ],
-              ),
+
+                const SizedBox(height: 16),
+
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
+                          decorationThickness: 0,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Title',
+                          labelStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryFixedVariant,
+                          ),
+                        ),
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Enter title' : null,
+                        onChanged: (val) => title = val.trim(),
+                      ),
+                      TextFormField(
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
+                          decorationThickness: 0,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Artist',
+                          labelStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryFixedVariant,
+                          ),
+                        ),
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Enter artist' : null,
+                        onChanged: (val) => artist = val.trim(),
+                      ),
+                      TextFormField(
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
+                          decorationThickness: 0,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Description (optional)',
+                          labelStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryFixedVariant,
+                          ),
+                        ),
+                        onChanged: (val) => description = val.trim(),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                if (errorMessage != null)
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+
+                Align(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: isUploading ? null : _upload,
+                    child: isUploading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Upload'),
+                  ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 24),
-
-            if (errorMessage != null)
-              Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-
-            ElevatedButton(
-              onPressed: isUploading ? null : _upload,
-              child: isUploading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Upload'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
