@@ -1,8 +1,8 @@
 import 'package:audio_player_app/screens/upload_screen.dart';
 import 'package:audio_player_app/widgets/free_audios_list_widget.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'audio_player_screen.dart';
 
@@ -22,13 +22,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<LocalAudioFile> _audioFiles = [];
+  bool _isLocalFilesLoading = false;
   int _currentIndex = 0;
 
   Future<void> _pickAudioFiles() async {
+    setState(() {
+      _isLocalFilesLoading = true;
+    });
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.audio,
       allowMultiple: true,
     );
+
+    await Future.delayed(const Duration(seconds: 1)); // Simulate load delay
 
     if (result != null) {
       List<LocalAudioFile> files = result.files
@@ -39,6 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
         _audioFiles = files;
       });
     }
+
+    setState(() {
+      _isLocalFilesLoading = false;
+    });
   }
 
   String _shortPath(String fullPath) {
@@ -60,39 +71,51 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Theme.of(
                 context,
               ).colorScheme.primary.withValues(alpha: 0.1),
-              image: AssetImage('assets/images/track.png'),
+              image: const AssetImage('assets/images/track.png'),
             ),
           ),
           ListView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             children: [
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed: _pickAudioFiles,
-                icon: Icon(Icons.library_music),
-                label: Text('Add audios from local storage.'),
+                icon: const Icon(Icons.library_music),
+                label: const Text('Add audios from local storage.'),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (ctx) => const UploadScreen()),
+                  );
                 },
                 icon: const Icon(Icons.upload_file),
                 label: const Text('Upload your audios.'),
               ),
               const SizedBox(height: 16),
-              if (_audioFiles.isNotEmpty) ...[
-                const Text(
-                  'Local Audios:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+
+              // LOCAL AUDIOS SECTION
+              Text(
+                'Local Audios:',
+                style: GoogleFonts.quicksand(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                 ),
+              ),
+              const SizedBox(height: 8),
+
+              if (_isLocalFilesLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (_audioFiles.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -100,17 +123,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final file = _audioFiles[index];
                     return Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
                         ),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.audiotrack, size: 40),
-                        title: Text(file.name),
-                        subtitle: Text(_shortPath(file.path)),
+                        leading: Icon(
+                          Icons.audiotrack,
+                          size: 40,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: Text(
+                          file.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        subtitle: Text(
+                          _shortPath(file.path),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -127,20 +167,31 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'No local audios found.',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
                 ),
-                Divider(),
-              ],
+
+              Divider(
+                color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+              ),
+
+              // FREE AUDIOS SECTION
               Text(
                 'Free Audios:',
-                style: TextStyle(
+                style: GoogleFonts.quicksand(
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimaryFixed,
+                  color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                 ),
               ),
-              SizedBox(
-                height: 400, // Adjust as needed
-                child: FreeAudiosListWidget(),
-              ),
+              SizedBox(height: 400, child: const FreeAudiosListWidget()),
             ],
           ),
         ],
@@ -153,14 +204,16 @@ class _HomeScreenState extends State<HomeScreen> {
             unselectedColor: Theme.of(
               context,
             ).colorScheme.onPrimaryFixedVariant,
-            icon: Icon(Icons.home),
-            title: Text("Home"),
+            icon: const Icon(Icons.home),
+            title: const Text("Home"),
             selectedColor: Theme.of(context).colorScheme.primary,
           ),
-
           SalomonBottomBarItem(
-            icon: Icon(Icons.person),
-            title: Text("Profile"),
+            unselectedColor: Theme.of(
+              context,
+            ).colorScheme.onPrimaryFixedVariant,
+            icon: const Icon(Icons.person),
+            title: const Text("Profile"),
             selectedColor: Theme.of(context).colorScheme.primary,
           ),
         ],
