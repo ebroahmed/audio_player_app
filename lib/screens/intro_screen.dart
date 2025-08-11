@@ -40,7 +40,7 @@ class _IntroScreenState extends State<IntroScreen> {
               SizedBox(height: 20),
               Text(
                 "Enjoy Your Moment!",
-                style: GoogleFonts.solway(
+                style: GoogleFonts.quicksand(
                   fontSize: 20,
                   color: Theme.of(context).colorScheme.secondary,
                 ),

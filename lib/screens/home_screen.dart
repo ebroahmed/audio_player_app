@@ -47,65 +47,75 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Audio Player')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Stack(
         children: [
-          ElevatedButton.icon(
-            onPressed: _pickAudioFiles,
-            icon: const Icon(Icons.library_music),
-            label: const Text('Add audios from local storage.'),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
-            },
-            icon: const Icon(Icons.upload_file),
-            label: const Text('Upload your audios.'),
-          ),
-          const SizedBox(height: 16),
-          if (_audioFiles.isNotEmpty) ...[
-            const Text(
-              'Local Audios:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          Center(
+            child: Image(
+              color: Colors.brown.withValues(alpha: 0.2),
+              image: AssetImage('assets/images/track.png'),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _audioFiles.length,
-              itemBuilder: (context, index) {
-                final file = _audioFiles[index];
-                return ListTile(
-                  leading: const Icon(Icons.audiotrack, size: 40),
-                  title: Text(file.name),
-                  subtitle: Text(_shortPath(file.path)),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AudioPlayerScreen(
-                          title: file.name,
-                          artist: 'Local File',
-                          description: '',
-                          audioPath: file.path,
-                        ),
-                      ),
+          ),
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              ElevatedButton.icon(
+                onPressed: _pickAudioFiles,
+                icon: const Icon(Icons.library_music),
+                label: const Text('Add audios from local storage.'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
+                },
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Upload your audios.'),
+              ),
+              const SizedBox(height: 16),
+              if (_audioFiles.isNotEmpty) ...[
+                const Text(
+                  'Local Audios:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _audioFiles.length,
+                  itemBuilder: (context, index) {
+                    final file = _audioFiles[index];
+                    return ListTile(
+                      leading: const Icon(Icons.audiotrack, size: 40),
+                      title: Text(file.name),
+                      subtitle: Text(_shortPath(file.path)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AudioPlayerScreen(
+                              title: file.name,
+                              artist: 'Local File',
+                              description: '',
+                              audioPath: file.path,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
-            const Divider(),
-          ],
-          const Text(
-            'Free Audios:',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 400, // Adjust as needed
-            child: FreeAudiosListWidget(),
+                ),
+                const Divider(),
+              ],
+              const Text(
+                'Free Audios:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 400, // Adjust as needed
+                child: FreeAudiosListWidget(),
+              ),
+            ],
           ),
         ],
       ),
