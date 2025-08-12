@@ -1,6 +1,8 @@
-import 'package:audio_player_app/widgets/audio_player_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../providers/audio_player_provider.dart';
+import 'package:audio_player_app/widgets/audio_player_controls.dart';
 
 class AudioPlayerScreen extends ConsumerWidget {
   final String title;
@@ -21,121 +23,144 @@ class AudioPlayerScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(title, style: GoogleFonts.quicksand()),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1E1E2C), Color(0xFF2A2A40)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Theme.of(context).colorScheme.primary, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(height: 30),
-
-                // Artwork / Placeholder
-                Hero(
-                  tag: title, // match from list page
-                  child: Container(
-                    height: 280,
-                    width: 280,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      image: const DecorationImage(
-                        image: AssetImage(
-                          "assets/images/placeholder_music.jpg",
-                        ), // or dynamic
-                        fit: BoxFit.cover,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 25,
-                          offset: const Offset(0, 15),
-                        ),
-                      ],
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(height: 30),
+              // Animated Rotating Disk
+              _AnimatedDisk(audioPath: audioPath, tag: title),
+              const SizedBox(height: 25),
+              // Track Info
+              Column(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    artist,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: 16,
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // Track Info
-                Column(
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      description,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      artist,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        description,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              // Audio Controls
+              AudioPlayerControls(audioPath: audioPath, title: title),
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                const SizedBox(height: 30),
+  // ...existing code...
+}
 
-                // Progress slider placeholder (can link with player later)
-                Column(
-                  children: [
-                    Slider(
-                      value: 0,
-                      min: 0,
-                      max: 100,
-                      activeColor: Colors.redAccent,
-                      inactiveColor: Colors.white.withOpacity(0.3),
-                      onChanged: (_) {},
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text("0:00", style: TextStyle(color: Colors.white)),
-                          Text("3:45", style: TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+class _AnimatedDisk extends ConsumerStatefulWidget {
+  final String audioPath;
+  final String tag;
+  const _AnimatedDisk({required this.audioPath, required this.tag});
 
-                const SizedBox(height: 20),
+  @override
+  ConsumerState<_AnimatedDisk> createState() => _AnimatedDiskState();
+}
 
-                // Audio Controls
-                AudioPlayerControls(audioPath: audioPath, title: title),
+class _AnimatedDiskState extends ConsumerState<_AnimatedDisk>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPlaying = false;
 
-                const SizedBox(height: 30),
-              ],
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    );
+    // Listen to player state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final player = ref.read(audioPlayerServiceProvider);
+      player.playerStateStream.listen((state) {
+        final playing = state.playing;
+        if (playing && !_isPlaying) {
+          _controller.repeat();
+          setState(() => _isPlaying = true);
+        } else if (!playing && _isPlaying) {
+          _controller.stop();
+          setState(() => _isPlaying = false);
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: widget.tag,
+      child: RotationTransition(
+        turns: _controller,
+        child: Container(
+          height: 280,
+          width: 280,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.primary,
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary,
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 4,
+            ),
+            image: const DecorationImage(
+              image: AssetImage("assets/images/track.png"),
+              fit: BoxFit.cover,
             ),
           ),
         ),

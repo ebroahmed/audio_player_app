@@ -60,7 +60,6 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
           widget.title,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-
         StreamBuilder<PlayerState>(
           stream: player.playerStateStream,
           builder: (context, snapshot) {
@@ -68,110 +67,127 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
             final processingState =
                 playerState?.processingState ?? ProcessingState.idle;
             final playing = playerState?.playing ?? false;
-
-            return Column(
-              children: [
-                StreamBuilder<Duration?>(
-                  stream: player.durationStream,
-                  builder: (context, durationSnapshot) {
-                    final duration = durationSnapshot.data ?? Duration.zero;
-
-                    return StreamBuilder<Duration>(
-                      stream: player.positionStream,
-                      builder: (context, positionSnapshot) {
-                        var position = positionSnapshot.data ?? Duration.zero;
-                        if (position > duration) {
-                          position = duration;
-                        }
-
-                        return Column(
+            return StreamBuilder<Duration?>(
+              stream: player.durationStream,
+              builder: (context, durationSnapshot) {
+                final duration = durationSnapshot.data ?? Duration.zero;
+                return StreamBuilder<Duration>(
+                  stream: player.positionStream,
+                  builder: (context, positionSnapshot) {
+                    var position = positionSnapshot.data ?? Duration.zero;
+                    if (position > duration) {
+                      position = duration;
+                    }
+                    return Column(
+                      children: [
+                        Slider(
+                          min: 0.0,
+                          max: duration.inMilliseconds.toDouble(),
+                          value: position.inMilliseconds.toDouble().clamp(
+                            0.0,
+                            duration.inMilliseconds.toDouble(),
+                          ),
+                          onChanged: (value) {
+                            player.seek(Duration(milliseconds: value.toInt()));
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(_formatDuration(position)),
+                              Text(_formatDuration(duration)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Slider(
-                              min: 0,
-                              max: duration.inMilliseconds.toDouble(),
-                              value: position.inMilliseconds.toDouble().clamp(
-                                0,
-                                duration.inMilliseconds.toDouble(),
-                              ),
-                              onChanged: (value) {
+                            IconButton(
+                              icon: const Icon(Icons.replay_10),
+                              iconSize: 36,
+                              onPressed: () async {
+                                final pos = await player.audioPlayer.position;
+                                final newPos =
+                                    pos - const Duration(seconds: 10);
                                 player.seek(
-                                  Duration(milliseconds: value.toInt()),
+                                  newPos < Duration.zero
+                                      ? Duration.zero
+                                      : newPos,
                                 );
                               },
                             ),
-
+                            IconButton(
+                              icon: playing
+                                  ? const Icon(Icons.pause)
+                                  : const Icon(Icons.play_arrow),
+                              iconSize: 48,
+                              onPressed:
+                                  processingState == ProcessingState.loading ||
+                                      processingState ==
+                                          ProcessingState.buffering
+                                  ? null
+                                  : () {
+                                      if (playing) {
+                                        player.pause();
+                                      } else {
+                                        player.play();
+                                      }
+                                    },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.forward_10),
+                              iconSize: 36,
+                              onPressed: () async {
+                                final pos = await player.audioPlayer.position;
+                                final dur =
+                                    await player.audioPlayer.duration ??
+                                    Duration.zero;
+                                final newPos =
+                                    pos + const Duration(seconds: 10);
+                                player.seek(newPos > dur ? dur : newPos);
+                              },
+                            ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(_formatDuration(position)),
-                                  Text(_formatDuration(duration)),
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: DropdownButton<double>(
+                                value: playbackSpeed,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 0.5,
+                                    child: Text("0.5x"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1.0,
+                                    child: Text("1x"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1.5,
+                                    child: Text("1.5x"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 2.0,
+                                    child: Text("2x"),
+                                  ),
                                 ],
+                                onChanged: (speed) {
+                                  if (speed == null) return;
+                                  setState(() {
+                                    playbackSpeed = speed;
+                                  });
+                                  player.setSpeed(speed);
+                                },
                               ),
                             ),
                           ],
-                        );
-                      },
+                        ),
+                      ],
                     );
                   },
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.stop),
-                      iconSize: 36,
-                      onPressed: processingState == ProcessingState.idle
-                          ? null
-                          : () => player.stop(),
-                    ),
-
-                    IconButton(
-                      icon: playing
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow),
-                      iconSize: 48,
-                      onPressed:
-                          processingState == ProcessingState.loading ||
-                              processingState == ProcessingState.buffering
-                          ? null
-                          : () {
-                              if (playing) {
-                                player.pause();
-                              } else {
-                                player.play();
-                              }
-                            },
-                    ),
-
-                    // Playback speed dropdown
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0),
-                      child: DropdownButton<double>(
-                        value: playbackSpeed,
-                        items: const [
-                          DropdownMenuItem(value: 0.5, child: Text("0.5x")),
-                          DropdownMenuItem(value: 1.0, child: Text("1x")),
-                          DropdownMenuItem(value: 1.5, child: Text("1.5x")),
-                          DropdownMenuItem(value: 2.0, child: Text("2x")),
-                        ],
-                        onChanged: (speed) {
-                          if (speed == null) return;
-                          setState(() {
-                            playbackSpeed = speed;
-                          });
-                          player.setSpeed(speed);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                );
+              },
             );
           },
         ),

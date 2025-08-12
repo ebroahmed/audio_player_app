@@ -2,6 +2,8 @@ import 'package:just_audio/just_audio.dart';
 
 class AudioPlayerService {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  // Public getter for the underlying AudioPlayer
+  AudioPlayer get audioPlayer => _audioPlayer;
 
   Stream<PlayerState> get playerStateStream => _audioPlayer.playerStateStream;
   Stream<Duration> get positionStream => _audioPlayer.positionStream;
