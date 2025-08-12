@@ -87,13 +87,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text('Audio Player'),
       ),
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Center(
             child: Image(
               color: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
+              ).colorScheme.primary.withValues(alpha: 0.08),
               image: const AssetImage('assets/images/track.png'),
             ),
           ),
@@ -123,6 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 'Local Audios:',
                 style: GoogleFonts.quicksand(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                 ),
@@ -155,13 +157,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         leading: Icon(
                           Icons.audiotrack,
                           size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
                         ),
                         title: Text(
                           file.name,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryFixedVariant,
                           ),
                         ),
                         subtitle: Text(
@@ -206,6 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 'Free Audios:',
                 style: GoogleFonts.quicksand(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                 ),

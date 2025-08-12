@@ -74,7 +74,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             child: Image(
               color: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
+              ).colorScheme.primary.withValues(alpha: 0.08),
               image: AssetImage('assets/images/track.png'),
             ),
           ),

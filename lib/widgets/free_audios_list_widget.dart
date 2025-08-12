@@ -37,13 +37,13 @@ class FreeAudiosListWidget extends ConsumerWidget {
               child: ListTile(
                 leading: Icon(
                   Icons.music_note,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                 ),
                 title: Text(
                   audio.title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
                   ),
                 ),
                 subtitle: Text(

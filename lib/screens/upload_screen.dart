@@ -98,7 +98,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
             child: Image(
               color: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
+              ).colorScheme.primary.withValues(alpha: 0.08),
               image: const AssetImage('assets/images/track.png'),
             ),
           ),

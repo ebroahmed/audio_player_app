@@ -32,127 +32,192 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onPressed: () async {
               await ref.read(authRepositoryProvider).signOut();
               if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Logged Out!'),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                  ),
+                );
                 Navigator.of(
                   context,
-                ).pushNamedAndRemoveUntil('/login', (route) => false);
+                ).pushNamedAndRemoveUntil('/login', (route) => true);
               }
             },
           ),
         ],
       ),
-      body: userAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text('Not logged in.'));
-          }
-          final firstLetter = user.displayName.isNotEmpty
-              ? user.displayName[0].toUpperCase()
-              : '?';
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          Center(
+            child: Image(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.08),
+              image: const AssetImage('assets/images/track.png'),
+            ),
+          ),
+          userAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error: $err')),
+            data: (user) {
+              if (user == null) {
+                return Center(
+                  child: Text(
+                    'Not logged in.',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                );
+              }
+              final firstLetter = user.displayName.isNotEmpty
+                  ? user.displayName[0].toUpperCase()
+                  : '?';
 
-          return ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                child: Text(
-                  firstLetter,
-                  style: const TextStyle(
-                    fontSize: 40,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              return ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  // Avatar
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      firstLetter,
+                      style: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Display Name
-              Center(
-                child: Text(
-                  user.displayName,
-                  style: GoogleFonts.quicksand(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+                  // Display Name
+                  Center(
+                    child: Text(
+                      user.displayName,
+                      style: GoogleFonts.quicksand(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Email
-              Center(
-                child: Text(
-                  user.email,
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    color: Colors.grey[700],
+                  const SizedBox(height: 8),
+                  // Email
+                  Center(
+                    child: Text(
+                      user.email,
+                      style: GoogleFonts.quicksand(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 12),
-              Text(
-                'Your Uploaded Audios',
-                style: GoogleFonts.quicksand(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
-                ),
-              ),
-              const SizedBox(height: 8),
-              // User's uploaded audios from Firestore
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('audio_tracks')
-                    .where('uploadedBy', isEqualTo: user.uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
-                      child: Center(child: Text('No uploads yet.')),
-                    );
-                  }
-                  final docs = snapshot.data!.docs;
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: docs.length,
-                    separatorBuilder: (_, __) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
-                      return ListTile(
-                        leading: const Icon(Icons.audiotrack),
-                        title: Text(data['title'] ?? 'No Title'),
-                        subtitle: Text(data['artist'] ?? ''),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AudioPlayerScreen(
-                                title: data['title'] ?? 'No Title',
-                                artist: data['artist'] ?? '',
-                                description: data['description'] ?? '',
-                                audioPath: data['audioUrl'] ?? '',
+                  SizedBox(height: 24),
+                  Divider(
+                    color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Your Uploaded Audios',
+                    style: GoogleFonts.quicksand(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // User's uploaded audios from Firestore
+                  StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('audio_tracks')
+                        .where('uploadedBy', isEqualTo: user.uid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(child: Text('No uploads yet.')),
+                        );
+                      }
+                      final docs = snapshot.data!.docs;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: docs.length,
+
+                        itemBuilder: (context, index) {
+                          final data =
+                              docs[index].data() as Map<String, dynamic>;
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryFixedVariant,
                               ),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.audiotrack,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryFixedVariant,
+                              ),
+                              title: Text(
+                                data['title'] ?? 'No Title',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryFixedVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                data['artist'] ?? '',
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AudioPlayerScreen(
+                                      title: data['title'] ?? 'No Title',
+                                      artist: data['artist'] ?? '',
+                                      description: data['description'] ?? '',
+                                      audioPath: data['audioUrl'] ?? '',
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           );
                         },
                       );
                     },
-                  );
-                },
-              ),
-            ],
-          );
-        },
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: _currentIndex,
