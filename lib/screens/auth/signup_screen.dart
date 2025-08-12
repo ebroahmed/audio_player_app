@@ -32,10 +32,27 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           .read(authRepositoryProvider)
           .signUp(email: email, password: password, displayName: displayName);
       widget.onSignupSuccess?.call();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Account created. Please login'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
       setState(() {
         isLoading = false;

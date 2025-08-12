@@ -1,5 +1,6 @@
 import 'package:audio_player_app/screens/auth/login_screen.dart';
 import 'package:audio_player_app/screens/auth/signup_screen.dart';
+import 'package:audio_player_app/screens/home_screen.dart';
 import 'package:audio_player_app/screens/intro_screen.dart';
 import 'package:audio_player_app/screens/upload_screen.dart';
 import 'package:audio_player_app/theme/theme.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => IntroScreen(),
+        '/home': (context) => HomeScreen(),
         '/login': (context) => LoginScreen(),
         '/signup': (context) => SignupScreen(),
         '/upload': (context) => UploadScreen(),

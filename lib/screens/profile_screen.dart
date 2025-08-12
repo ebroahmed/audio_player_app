@@ -32,7 +32,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onPressed: () async {
               await ref.read(authRepositoryProvider).signOut();
               if (mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/login', (route) => false);
               }
             },
           ),
@@ -104,7 +106,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 stream: FirebaseFirestore.instance
                     .collection('audio_tracks')
                     .where('uploadedBy', isEqualTo: user.uid)
-                    .orderBy('uploadedAt', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
