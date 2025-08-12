@@ -63,11 +63,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             data: (user) {
               if (user == null) {
                 return Center(
-                  child: Text(
-                    'Not logged in.',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  child: Stack(
+                    children: [
+                      Text(
+                        'Not logged in yet.',
+                        style: GoogleFonts.quicksand(
+                          fontSize: 20,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryFixedVariant,
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 25),
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/login');
+                          },
+                          label: Text(
+                            'Click To Login.',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryFixedVariant,
+                            ),
+                          ),
+                          icon: Icon(Icons.arrow_forward),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }

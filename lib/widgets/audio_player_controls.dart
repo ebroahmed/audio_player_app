@@ -56,10 +56,6 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
         StreamBuilder<PlayerState>(
           stream: player.playerStateStream,
           builder: (context, snapshot) {
@@ -81,6 +77,8 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                     return Column(
                       children: [
                         Slider(
+                          inactiveColor: Theme.of(context).colorScheme.tertiary,
+                          activeColor: Theme.of(context).colorScheme.primary,
                           min: 0.0,
                           max: duration.inMilliseconds.toDouble(),
                           value: position.inMilliseconds.toDouble().clamp(
@@ -96,8 +94,22 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(_formatDuration(position)),
-                              Text(_formatDuration(duration)),
+                              Text(
+                                _formatDuration(position),
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryFixedVariant,
+                                ),
+                              ),
+                              Text(
+                                _formatDuration(duration),
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryFixedVariant,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -106,12 +118,14 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.replay_10),
+                              icon: Icon(
+                                Icons.replay_10,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                               iconSize: 36,
                               onPressed: () async {
                                 final pos = await player.audioPlayer.position;
-                                final newPos =
-                                    pos - const Duration(seconds: 10);
+                                final newPos = pos - Duration(seconds: 10);
                                 player.seek(
                                   newPos < Duration.zero
                                       ? Duration.zero
@@ -121,8 +135,18 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                             ),
                             IconButton(
                               icon: playing
-                                  ? const Icon(Icons.pause)
-                                  : const Icon(Icons.play_arrow),
+                                  ? Icon(
+                                      Icons.pause,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    )
+                                  : Icon(
+                                      Icons.play_arrow,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryFixedVariant,
+                                    ),
                               iconSize: 48,
                               onPressed:
                                   processingState == ProcessingState.loading ||
@@ -138,7 +162,10 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                                     },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.forward_10),
+                              icon: Icon(
+                                Icons.forward_10,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                               iconSize: 36,
                               onPressed: () async {
                                 final pos = await player.audioPlayer.position;
@@ -153,8 +180,13 @@ class _AudioPlayerControlsState extends ConsumerState<AudioPlayerControls> {
                             Padding(
                               padding: const EdgeInsets.only(left: 12.0),
                               child: DropdownButton<double>(
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryFixedVariant,
+                                ),
                                 value: playbackSpeed,
-                                items: const [
+                                items: [
                                   DropdownMenuItem(
                                     value: 0.5,
                                     child: Text("0.5x"),

@@ -81,15 +81,6 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text('Upload Audio', style: GoogleFonts.quicksand(fontSize: 20)),
-        actions: [
-          IconButton(
-            onPressed: () {
-              final auth = ref.read(authRepositoryProvider);
-              auth.signOut();
-            },
-            icon: Icon(Icons.logout),
-          ),
-        ],
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -211,8 +202,10 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
                     ),
                     onPressed: isUploading ? null : _upload,
                     child: isUploading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Upload'),
+                        ? CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary,
+                          )
+                        : Text('Upload'),
                   ),
                 ),
               ],

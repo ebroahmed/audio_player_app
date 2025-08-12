@@ -1,6 +1,7 @@
 import 'package:audio_player_app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   final VoidCallback? onSignupSuccess;
@@ -165,7 +166,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     },
                     child: Text(
                       'Already have an account? Login',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.quicksand(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

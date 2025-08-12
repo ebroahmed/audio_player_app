@@ -66,10 +66,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     userAsync.when(
       data: (user) {
         if (user == null) {
-          // Not logged in, show login screen
           Navigator.of(context).pushNamed('/login');
         } else {
-          // Logged in, go to upload screen
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (ctx) => UploadScreen()));
