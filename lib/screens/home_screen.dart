@@ -1,4 +1,5 @@
 import 'package:audio_player_app/providers/auth_provider.dart';
+import 'package:audio_player_app/screens/profile_screen.dart';
 import 'package:audio_player_app/screens/upload_screen.dart';
 
 import 'package:audio_player_app/widgets/free_audios_list_widget.dart';
@@ -216,7 +217,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          if (index == 1) {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+          }
+        },
+
         items: [
           SalomonBottomBarItem(
             unselectedColor: Theme.of(

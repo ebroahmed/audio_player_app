@@ -46,53 +46,116 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              if (errorMessage != null)
-                Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Display Name'),
-                onChanged: (val) => displayName = val.trim(),
-                validator: (val) =>
-                    val == null || val.isEmpty ? 'Enter a display name' : null,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (val) => email = val.trim(),
-                validator: (val) => val == null || !val.contains('@')
-                    ? 'Enter a valid email'
-                    : null,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (val) => password = val.trim(),
-                validator: (val) =>
-                    val == null || val.length < 6 ? 'Password too short' : null,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: isLoading ? null : _signup,
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Sign Up'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-                child: const Text('Already have an account? Login'),
-              ),
-            ],
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text('Sign Up'),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          Center(
+            child: Image(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
+              image: AssetImage('assets/images/track.png'),
+            ),
           ),
-        ),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  if (errorMessage != null)
+                    Text(errorMessage!, style: TextStyle(color: Colors.red)),
+                  TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Display Name',
+                      labelStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                      ),
+                    ),
+                    onChanged: (val) => displayName = val.trim(),
+                    validator: (val) => val == null || val.isEmpty
+                        ? 'Enter a display name'
+                        : null,
+                  ),
+                  TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (val) => email = val.trim(),
+                    validator: (val) => val == null || !val.contains('@')
+                        ? 'Enter a valid email'
+                        : null,
+                  ),
+                  TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryFixedVariant,
+                      decorationThickness: 0,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      labelStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryFixedVariant,
+                      ),
+                    ),
+                    obscureText: true,
+                    onChanged: (val) => password = val.trim(),
+                    validator: (val) => val == null || val.length < 6
+                        ? 'Password too short'
+                        : null,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: isLoading ? null : _signup,
+                    child: isLoading
+                        ? CircularProgressIndicator()
+                        : Text('Sign Up'),
+                  ),
+                  SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
+                    child: Text(
+                      'Already have an account? Login',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
