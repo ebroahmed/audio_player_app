@@ -150,13 +150,7 @@ class _AnimatedDiskState extends ConsumerState<_AnimatedDisk>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Theme.of(context).colorScheme.primary,
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.primary,
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+
             border: Border.all(
               color: Theme.of(context).colorScheme.primary,
               width: 4,

@@ -84,6 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text('Audio Player'),
+        automaticallyImplyLeading: false,
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(

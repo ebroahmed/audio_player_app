@@ -45,8 +45,8 @@ dependencies:
   file_picker: ^10.2.3
   permission_handler: ^12.0.1
   google_fonts: ^6.3.0
-  curved_navigation_bar: ^1.0.6
   salomon_bottom_bar: ^3.3.2
+  flutter_launcher_icons: ^0.14.4
   
   
 
@@ -76,7 +76,10 @@ flutter:
   assets:
     - assets/images/track.png
   #   - images/a_dot_ham.jpeg
-
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/track.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
